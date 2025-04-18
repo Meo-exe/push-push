@@ -6,6 +6,7 @@ from app.database import engine, get_db, Base
 from app.routes.api import router as api_router
 from app.services.data_importer import import_f1_data
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
@@ -58,7 +59,7 @@ async def trigger_data_import(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
-    if season < 1950 or season > 2025:
+    if season < 1950 or season > datetime.now().year:
         raise HTTPException(status_code=400, detail="Season must be between 1950 and 2025")
     
     # Run import in background to avoid timeout
