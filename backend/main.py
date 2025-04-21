@@ -55,17 +55,20 @@ def read_root():
 
 @app.get("/api/import-data/{season}")
 async def trigger_data_import(
-    season: int, 
+    season: int,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     if season < 1950 or season > datetime.now().year:
-        raise HTTPException(status_code=400, detail="Season must be between 1950 and 2025")
-    
+        raise HTTPException(
+            status_code=400, detail="Season must be between 1950 and 2025")
+
     # Run import in background to avoid timeout
     background_tasks.add_task(import_f1_data, season, db)
     return {"message": f"Data import for {season} season started in background"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
